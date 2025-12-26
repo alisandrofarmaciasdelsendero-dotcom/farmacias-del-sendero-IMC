@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMC + Farmasen | Farmacias del Sendero</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f6f8;
+    color:#333;
+}
+header{
+    background:#fff;
+    padding:15px;
+    text-align:center;
+    border-bottom:4px solid #f57c00;
+}
+header img{
+    max-width:320px;
+}
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+.card{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+h2{
+    color:#0d47a1;
+    margin-top:0;
+}
+input, button{
+    padding:10px;
+    width:100%;
+    margin:6px 0;
+    font-size:16px;
+}
+button{
+    background:#f57c00;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+button:hover{
+    background:#ef6c00;
+}
+.result{
+    font-size:18px;
+    margin-top:10px;
+    font-weight:bold;
+}
+.recomendaciones{
+    font-size:18px;
+    line-height:1.6;
+}
+.regla{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+}
+.barra{
+    height:12px;
+    border-radius:10px;
+    background:linear-gradient(to right,#4caf50,#ffeb3b,#f44336);
+}
+.historial-item{
+    border-bottom:1px solid #ddd;
+    padding:8px 0;
+}
+small{
+    color:#666;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <img src="LOGOS.png" alt="Farmacias del Sendero">
+</header>
+
+<div class="container">
+<div class="card">
+<h2>Calculadora de IMC</h2>
+
+<label>Peso (kg)</label>
+<input type="number" id="peso" placeholder="Ej. 70">
+
+<label>Estatura (cm)</label>
+<input type="number" id="estatura" placeholder="Ej. 170">
+
+<button onclick="calcularIMC()">Evaluar</button>
+
+<div class="regla">
+    <small>Bajo</small>
+    <small>Normal</small>
+    <small>Sobrepeso</small>
+</div>
+<div class="barra"></div>
+
+<div class="result" id="resultado"></div>
+<div class="recomendaciones" id="recomendaciones"></div>
+</div>
+<div class="card">
+<h2>Tarjeta Farmasen</h2>
+
+<label>Nombre</label>
+<input type="text" id="nombre" placeholder="Nombre completo">
+
+<label>CURP</label>
+<input type="text" id="curp" placeholder="CURP">
+
+<label>Número telefónico</label>
+<input type="tel" id="telefono" placeholder="10 dígitos">
+
+<button onclick="registrarFarmasen()">Registrar tarjeta</button>
+
+<p class="result" id="codigoFarmasen"></p>
+
+<div style="text-align:center;margin-top:15px;">
+    <img src="FARMA.jpg" style="max-width:100%;border-radius:10px;">
+</div>
+
+<canvas id="barcode" style="margin-top:15px;"></canvas>
+
+</div>
+<div class="card">
+<h2>Historial de Evaluaciones</h2>
+<div id="historial"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+let folio = localStorage.getItem("folio") || 1;
+let contadorFarmasen = localStorage.getItem("contadorFarmasen") || 1;
+
+function calcularIMC(){
+    let peso = document.getElementById("peso").value;
+    let estatura = document.getElementById("estatura").value / 100;
+
+    if(!peso || !estatura) return;
+
+    let imc = (peso / (estatura*estatura)).toFixed(1);
+    let clasificacion = "";
+    let recomendaciones = "";
+
+    if(imc < 18.5){
+        clasificacion = "Bajo peso";
+        recomendaciones = "🍽️ Aumenta calorías saludables<br>🥛 Incluye proteínas<br>💤 Descansa bien";
+    }else if(imc < 25){
+        clasificacion = "Peso normal";
+        recomendaciones = "✅ Mantén hábitos saludables<br>🚶 Actividad física regular<br>🥗 Alimentación balanceada";
+    }else{
+        clasificacion = "Sobrepeso";
+        recomendaciones = "🏃 Incrementa actividad física<br>🥗 Reduce azúcares<br>💧 Toma más agua";
+    }
+
+    document.getElementById("resultado").innerHTML =
+        `IMC: ${imc} – ${clasificacion}`;
+
+    document.getElementById("recomendaciones").innerHTML =
+        recomendaciones;
+
+    guardarHistorial(imc, clasificacion);
+}
+
+function guardarHistorial(imc, clasificacion){
+    let historial = JSON.parse(localStorage.getItem("historial")) || [];
+    historial.push({
+        folio: folio,
+        imc: imc,
+        clasificacion: clasificacion,
+        fecha: new Date().toLocaleString()
+    });
+    localStorage.setItem("historial", JSON.stringify(historial));
+    folio++;
+    localStorage.setItem("folio", folio);
+    mostrarHistorial();
+}
+
+function mostrarHistorial(){
+    let historial = JSON.parse(localStorage.getItem("historial")) || [];
+    let cont = document.getElementById("historial");
+    cont.innerHTML = "";
+    historial.forEach(h=>{
+        cont.innerHTML += `
+        <div class="historial-item">
+        <strong>Folio:</strong> ${h.folio}<br>
+        IMC: ${h.imc} (${h.clasificacion})<br>
+        <small>${h.fecha}</small>
+        </div>`;
+    });
+}
+mostrarHistorial();
+
+function registrarFarmasen(){
+    let tel = document.getElementById("telefono").value;
+    if(!tel) return;
+
+    let tarjetas = JSON.parse(localStorage.getItem("farmasen")) || {};
+
+    if(!tarjetas[tel]){
+        tarjetas[tel] = "FARMASEN " + String(contadorFarmasen).padStart(3,"0");
+        contadorFarmasen++;
+        localStorage.setItem("contadorFarmasen", contadorFarmasen);
+        localStorage.setItem("farmasen", JSON.stringify(tarjetas));
+    }
+
+    let codigo = tarjetas[tel];
+    document.getElementById("codigoFarmasen").innerText = "Código: " + codigo;
+
+    JsBarcode("#barcode", codigo, {
+        format:"CODE128",
+        width:2,
+        height:70,
+        displayValue:true
+    });
+}
+</script>
+</div>
+</body>
+</html>
