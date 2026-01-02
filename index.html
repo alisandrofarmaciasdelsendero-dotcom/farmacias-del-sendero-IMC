@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IMC + Farmasen | Farmacias del Sendero</title>
 
 <style>
 body{
@@ -25,13 +24,6 @@ header img{
     max-width:1100px;
     margin:auto;
     padding:20px;
-}
-.card{
-    background:#fff;
-    border-radius:10px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 4px 10px rgba(0,0,0,.1);
 }
 h2{
     color:#0d47a1;
@@ -112,35 +104,10 @@ small{
 <div class="card">
 <h2>Tarjeta Farmasen</h2>
 
-<label>Nombre</label>
-<input type="text" id="nombre" placeholder="Nombre completo">
 
-<label>CURP</label>
-<input type="text" id="curp" placeholder="CURP">
 
-<label>Número telefónico</label>
-<input type="tel" id="telefono" placeholder="10 dígitos">
-
-<button onclick="registrarFarmasen()">Registrar tarjeta</button>
-
-<p class="result" id="codigoFarmasen"></p>
-
-<div style="text-align:center;margin-top:15px;">
-    <img src="FARMA.jpg" style="max-width:100%;border-radius:10px;">
-</div>
-
-<canvas id="barcode" style="margin-top:15px;"></canvas>
-
-</div>
-<div class="card">
-<h2>Historial de Evaluaciones</h2>
-<div id="historial"></div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <script>
-let folio = localStorage.getItem("folio") || 1;
-let contadorFarmasen = localStorage.getItem("contadorFarmasen") || 1;
 
 function calcularIMC(){
     let peso = document.getElementById("peso").value;
@@ -206,4 +173,5 @@ mostrarHistorial();
 </div>
 </body>
 </html>
+
 
