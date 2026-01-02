@@ -200,31 +200,10 @@ function mostrarHistorial(){
     });
 }
 mostrarHistorial();
-
-function registrarFarmasen(){
-    let tel = document.getElementById("telefono").value;
-    if(!tel) return;
-
-    let tarjetas = JSON.parse(localStorage.getItem("farmasen")) || {};
-
-    if(!tarjetas[tel]){
-        tarjetas[tel] = "FARMASEN " + String(contadorFarmasen).padStart(3,"0");
-        contadorFarmasen++;
-        localStorage.setItem("contadorFarmasen", contadorFarmasen);
-        localStorage.setItem("farmasen", JSON.stringify(tarjetas));
-    }
-
-    let codigo = tarjetas[tel];
-    document.getElementById("codigoFarmasen").innerText = "Código: " + codigo;
-
-    JsBarcode("#barcode", codigo, {
-        format:"CODE128",
-        width:2,
-        height:70,
-        displayValue:true
     });
 }
 </script>
 </div>
 </body>
 </html>
+
